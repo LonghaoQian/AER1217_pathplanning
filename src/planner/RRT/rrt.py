@@ -16,12 +16,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 """
 
 import numpy as np
-import rrt_utils
-
-
+from .rrt_utils import *
 class RRTPlanner:
-    def __init__(self, map, start_pos, goal_pos, maxItrs, stepSize, goalTolerance, collisionTolerance):
-        self.map = map
+    def __init__(self, aera_map, start_pos, goal_pos, maxItrs, stepSize, goalTolerance, collisionTolerance):
+        self.aera_map = aera_map
         self.start_pos = start_pos
         self.goal_pos = goal_pos
         self.maxItrs = maxItrs
@@ -47,14 +45,14 @@ class RRTPlanner:
         self.obstacleList.append(obstacle)
 
     def AddChild(self, pos_x, pos_y, parent):
-        self.nodeList.append(rrt_utils.TreeNode(pos_x, pos_y, parent))
+        self.nodeList.append(TreeNode(pos_x, pos_y, parent))
 
     def GetSteerCoorindate(self, nodeIdx, point):
-        offset = self.stepSize * rrt_utils.FindDirection(self.nodeList[nodeIdx].pox_x, self.nodeList[nodeIdx].pox_y, point[0], point[1])
-        return np.array([self.nodeList[nodeIdx].pox_x + offset[0], self.nodeList[nodeIdx].pox_y + offset[1]])
+        offset = self.stepSize * FindDirection(self.nodeList[nodeIdx].pos_x, self.nodeList[nodeIdx].pos_y, point[0], point[1])
+        return np.array([self.nodeList[nodeIdx].pos_x + offset[0], self.nodeList[nodeIdx].pos_y + offset[1]])
 
     def MakeSample(self):
-        return map.MakeSample()
+        return self.aera_map.MakeSample()
 
     def FindNearest(self, rootIdx, point):
         if rootIdx < 0 or rootIdx >= len(self.nodeList):
@@ -65,8 +63,8 @@ class RRTPlanner:
             self.nearestNodeIdx = rootIdx
             self.minDist = dist
 
-        for child in self.nodeList[rootIdx]:
-            self.FindNearest(child)
+        for child in self.nodeList[rootIdx].children:
+            self.FindNearest(child, point)
 
     def UpdateOneStep(self):
         # reset nearest value
@@ -83,16 +81,14 @@ class RRTPlanner:
         # do the steering
         next = self.GetSteerCoorindate(self.nearestNodeIdx, newPoint)
         # check obstacle
-        noCollision = True
         for ob in self.obstacleList:
             # self.collisionTolerance
-            if ob.DetectLineCollision(next[0], next[1], self.nodeList[self.nearestNodeIdx].pox_x, self.nodeList[self.nearestNodeIdx].pox_y, self.collisionTolerance):
-                noCollision = False
-                break
+            if ob.DetectLineCollision(next[0], next[1], self.nodeList[self.nearestNodeIdx].pos_x, self.nodeList[self.nearestNodeIdx].pos_y, self.collisionTolerance):
+                return False
 
-        if noCollision:
-            self.AddChild(next[0], next[1], self.nearestNodeIdx)
-            self.nodeList[self.nearestNodeIdx].children.append(len(self.nodeList))
+        self.AddChild(next[0], next[1], self.nearestNodeIdx)
+        self.nodeList[self.nearestNodeIdx].children.append(len(self.nodeList))
+        return True
 
     def CheckGoal(self, currNode, goalNode):
         return currNode.GetDistanceNode(goalNode) < self.goalTolerance

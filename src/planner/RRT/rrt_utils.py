@@ -11,11 +11,11 @@ def FindDirection(starting_x, starting_y, ending_x, ending_y):
 
 # use linked list as the node data structure.
 class TreeNode:
-    def __init__(self, pos_x, pos_y, parent=None):
+    def __init__(self, pos_x, pos_y, parent=-1):
         self.pos_x = pos_x
         self.pos_y = pos_y
         self.children = list()  # initialized the children nodes as an empty list
-        self.parent = parent  # a node only has one parent
+        self.parent = parent  # invalid idx
 
     def GetDistancePoint(self, other_x, other_y):
         return np.sqrt((self.pos_x - other_x)**2 + (self.pos_y - other_y)**2)
@@ -25,7 +25,7 @@ class TreeNode:
 
 
 # for simplicity, use square map
-class SquareMapInfo:
+class SquareMap:
     def __init__(self, bottomleft_x, bottomleft_y, topRight_x, topRight_y):
         self.bottomleft_x = bottomleft_x
         self.bottomleft_y = bottomleft_y
@@ -53,3 +53,18 @@ class Obstacles:
 
     def DetectPointCollision(self, pos_x, pos_y, tolerance):
         return np.sqrt((self.center_x - pos_x)**2 + (self.center_y - pos_y)**2) <= self.radius + tolerance
+
+
+def GenerateMapBorder(squareMap):
+    x = [squareMap.bottomleft_x, squareMap.topRight_x, squareMap.topRight_x, squareMap.bottomleft_x, squareMap.bottomleft_x]
+    y = [squareMap.bottomleft_y, squareMap.bottomleft_y, squareMap.topRight_y, squareMap.topRight_y, squareMap.bottomleft_y]
+    return x, y
+
+def GenerateCircles(obstacle, n=30):
+    theta = np.linspace(0, 2*np.pi, n)
+    x = list()
+    y = list()
+    for t in theta:
+        x.append(obstacle.center_x + np.cos(t)*obstacle.radius)
+        y.append(obstacle.center_y + np.sin(t)*obstacle.radius)
+    return x, y
