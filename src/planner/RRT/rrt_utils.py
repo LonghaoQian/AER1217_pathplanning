@@ -21,7 +21,7 @@ class TreeNode:
         return np.sqrt((self.pos_x - other_x)**2 + (self.pos_y - other_y)**2)
 
     def GetDistanceNode(self, otherNode):
-        return self.GetDistancePoint(self, otherNode.pos_x, otherNode.pos_y)
+        return self.GetDistancePoint(otherNode.pos_x, otherNode.pos_y)
 
 
 # for simplicity, use square map

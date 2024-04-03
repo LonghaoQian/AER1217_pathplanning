@@ -90,19 +90,41 @@ class RRTPlanner:
         self.nodeList[self.nearestNodeIdx].children.append(len(self.nodeList))
         return True
 
-    def CheckGoal(self, currNode, goalNode):
-        return currNode.GetDistanceNode(goalNode) < self.goalTolerance
+    def CheckGoal(self, currNode):
+        return currNode.GetDistanceNode(self.goal_pos) < self.goalTolerance
 
     def Calculate(self):
         # iterate until whether the maximum itr reached
         for _ in range(self.maxItrs):
             self.UpdateOneStep()
-            if self.CheckGoal():
+            if self.CheckGoal(self.nodeList[-1]):
+                parentIdx = len(self.nodeList) - 1
                 self.pathFound = True
                 self.nodeList.append(self.goal_pos)
+                self.nodeList[-1].parent = parentIdx
                 break
         
         if self.pathFound:
             print("can not find path to goal!")
         else:
             print("path found!")
+
+    def FormPath(self):
+        # check the last node
+        if not self.CheckGoal(self.nodeList[-1]):
+            print("not a valid end point!")
+            return list()
+        parentIdx =self.nodeList[-1].parent
+        # add the last element
+        tmp = [len(self.nodeList) - 1]
+        while parentIdx >= 0:
+            tmp.append(parentIdx)
+            parentIdx = self.nodeList[parentIdx].parent
+
+        # flip
+        res = list()
+        n = len(tmp)
+        for i in range(n):
+            res.append(tmp[n - i - 1])
+
+        return res
