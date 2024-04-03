@@ -11,11 +11,12 @@ def FindDirection(starting_x, starting_y, ending_x, ending_y):
 
 # use linked list as the node data structure.
 class TreeNode:
-    def __init__(self, pos_x, pos_y, parent=-1):
+    def __init__(self, pos_x, pos_y, parent=-1, cost=0):
         self.pos_x = pos_x
         self.pos_y = pos_y
         self.children = list()  # initialized the children nodes as an empty list
         self.parent = parent  # invalid idx
+        self.cost = cost # cost from root to this node
 
     def GetDistancePoint(self, other_x, other_y):
         return np.sqrt((self.pos_x - other_x)**2 + (self.pos_y - other_y)**2)

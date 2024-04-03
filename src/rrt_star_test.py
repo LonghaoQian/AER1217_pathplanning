@@ -7,15 +7,20 @@ if __name__ == "__main__":
     # starting node
     start = pl.TreeNode(10, 10)
     goal = pl.TreeNode(73, 40)
-    planner = pl.RRTPlanner(squareMap, start, goal, 10000, 5, 5, 1)
-    planner.AddObstacles(pl.Obstacles(40, 20, 8))
-    planner.AddObstacles(pl.Obstacles(60, 35, 5))
+    maxItr = 10000
+    stepSize = 3
+    rewireRadius = 15
+    goalTolerance = 5
+    collisionTolerance = 1
+    planner = pl.RRTStarPlanner(squareMap, start, goal, maxItr, stepSize, rewireRadius, goalTolerance , collisionTolerance)
+    planner.AddObstacles(pl.Obstacles(40, 18, 10))
+    planner.AddObstacles(pl.Obstacles(60, 38, 5))
     x_m, y_m = pl.GenerateMapBorder(squareMap)
     ob_coordinate = list()
     for ob in planner.obstacleList:
         x, y = pl.GenerateCircles(ob)
         ob_coordinate.append([x, y])
-
+    
     plt.ion()  # turning interactive mode on
     fig, ax = plt.subplots()
     ax.axis('equal')
@@ -33,7 +38,6 @@ if __name__ == "__main__":
     ax.scatter(planner.goal_pos.pos_x, planner.goal_pos.pos_y, c='b')
     fig.canvas.draw()
     fig.canvas.flush_events()
-
 
     for _ in range(1000):
         if planner.UpdateOneStep():
