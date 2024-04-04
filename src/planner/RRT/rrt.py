@@ -103,11 +103,31 @@ class RRTPlanner:
                 self.nodeList.append(self.goal_pos)
                 self.nodeList[-1].parent = parentIdx
                 break
-        
+
         if self.pathFound:
             print("can not find path to goal!")
         else:
             print("path found!")
+
+    def FormPath(self):
+        # check the last node
+        if not self.CheckGoal(self.nodeList[-1]):
+            print("not a valid end point!")
+            return list()
+        parentIdx =self.nodeList[-1].parent
+        # add the last element
+        tmp = [len(self.nodeList) - 1]
+        while parentIdx >= 0:
+            tmp.append(parentIdx)
+            parentIdx = self.nodeList[parentIdx].parent
+
+        # flip
+        res = list()
+        n = len(tmp)
+        for i in range(n):
+            res.append(tmp[n - i - 1])
+
+        return res
 
     def FormPath(self):
         # check the last node

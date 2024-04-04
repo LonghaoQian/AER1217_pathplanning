@@ -152,3 +152,19 @@ class RRTStarPlanner:
         self.AddChild(next[0], next[1], newParent, newCost)
         self.nodeList[newParent].children.append(len(self.nodeList))
         return True
+
+    def Calculate(self):
+        # iterate until whether the maximum itr reached
+        for _ in range(self.maxItrs):
+            self.UpdateOneStep()
+            if self.CheckGoal(self.nodeList[-1]):
+                parentIdx = len(self.nodeList) - 1
+                self.pathFound = True
+                self.nodeList.append(self.goal_pos)
+                self.nodeList[-1].parent = parentIdx
+                break
+        
+        if self.pathFound:
+            print("can not find path to goal!")
+        else:
+            print("path found!")
