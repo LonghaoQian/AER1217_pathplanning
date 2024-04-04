@@ -142,10 +142,6 @@ class RRTStarPlanner:
         # check obstacle
         if not self.CheckCollision(next, self.nodeList[self.nearestNodeIdx]):
             return False
-        # for ob in self.obstacleList:
-        #     # self.collisionTolerance
-        #     if ob.DetectLineCollision(next[0], next[1], self.nodeList[self.nearestNodeIdx].pos_x, self.nodeList[self.nearestNodeIdx].pos_y, self.collisionTolerance):
-        #         return False
 
         # get neighbors
         self.FindNeighbors(next)

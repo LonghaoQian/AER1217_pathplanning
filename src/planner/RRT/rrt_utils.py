@@ -48,9 +48,17 @@ class Obstacles:
 
     def DetectLineCollision(self, starting_x, starting_y, ending_x, ending_y, tolerance):
         n0 = FindDirection(starting_x, starting_y, ending_x, ending_y)
+        l = np.sqrt((starting_x - starting_y)**2 + (ending_x - ending_y)**2)
         p = np.array([self.center_x - starting_x, self.center_y - starting_y])
-        dist = p - np.inner(p, n0) * n0
-        return np.linalg.norm(dist) <= self.radius + tolerance
+        tmp = np.inner(p, n0)
+        # if tmp is less than l and greater than 0, means that the nearest point in on the line segement
+        if tmp>= 0 and tmp <= l:
+            dist = p - tmp * n0
+            return np.linalg.norm(dist) <= self.radius + tolerance
+        
+        # if tmp lies outside of the line segement, check the starting and ending points
+        return self.DetectPointCollision(starting_x, starting_y, tolerance) or self.DetectPointCollision(ending_x, ending_y, tolerance)
+
 
     def DetectPointCollision(self, pos_x, pos_y, tolerance):
         return np.sqrt((self.center_x - pos_x)**2 + (self.center_y - pos_y)**2) <= self.radius + tolerance
